@@ -1,0 +1,450 @@
+<!doctype html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ruota della Fortuna - Impero Sushi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Inter&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family:'Inter',sans-serif;
+      background: radial-gradient(circle at center, #0b1d3a 0%, #1a1f3a 100%);
+      color:#f0f0f0;
+    }
+    .wrap {
+      max-width:800px;
+      width:100%;
+      padding:20px;
+      box-sizing:border-box;
+      text-align:center;
+    }
+    h1 {
+      margin:10px 0;
+      font-size:30px;
+      font-family:'Cinzel',serif;
+      color:#d4af37;
+      letter-spacing:2px;
+    }
+    .card {
+      position:relative;
+      width:100%;
+      max-width:560px;
+      aspect-ratio:1/1;
+      margin:0 auto;
+      border-radius:50%;
+      box-shadow:0 0 30px rgba(212,175,55,0.3);
+      background: radial-gradient(circle, #1a1f3a 0%, #0b1d3a 100%);
+    }
+    canvas {
+      width:100%;
+      height:auto;
+      display:block;
+    }
+    .center-logo {
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      width:100px;
+      height:100px;
+      background:black;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:3px solid #d4af37;
+      box-shadow:0 0 15px #d4af37;
+      pointer-events:none;
+    }
+    .center-logo img {
+      width:80px;
+      height:80px;
+      object-fit:contain;
+    }
+    button {
+      margin-top:20px;
+      padding:12px 30px;
+      border-radius:10px;
+      border:none;
+      background:linear-gradient(145deg,#d4af37,#bfa134);
+      color:#0b1d3a;
+      font-weight:600;
+      cursor:pointer;
+      font-size:18px;
+      transition:transform 0.2s ease;
+    }
+    button:hover { transform:scale(1.05); }
+    button:disabled {
+      background:#555;
+      color:#999;
+      cursor:not-allowed;
+    }
+    #resultCard {
+      display:none;
+      margin-top:20px;
+      padding:20px;
+      border-radius:14px;
+      background:rgba(20,30,50,0.9);
+      border:2px solid #d4af37;
+      color:#f5f5f5;
+      animation:fadeIn 1s ease forwards;
+    }
+    #resultCard h2 {
+      font-size:24px;
+      margin-bottom:10px;
+      color:#d4af37;
+      font-family:'Cinzel',serif;
+    }
+    #resultCard p {
+      margin:6px 0;
+      font-size:18px;
+    }
+    .whatsapp-btn {
+      display:inline-block;
+      margin-top:12px;
+      padding:12px 18px;
+      background:#d4af37;
+      color:#0b1d3a;
+      font-weight:600;
+      border-radius:10px;
+      text-decoration:none;
+      font-size:16px;
+      transition:background 0.2s;
+    }
+    .whatsapp-btn:hover { background:#bfa134; }
+    #historyCard {
+      margin-top:20px;
+      padding:15px;
+      border-radius:10px;
+      background:rgba(20,30,50,0.85);
+      border:1px solid #d4af37;
+      max-width:500px;
+      margin-left:auto;
+      margin-right:auto;
+      text-align:left;
+    }
+    #historyCard h3 {
+      margin-top:0;
+      color:#d4af37;
+      font-family:'Cinzel',serif;
+    }
+    #prizesList { padding-left:20px; }
+    @keyframes fadeIn {
+      from{opacity:0;transform:translateY(10px);}
+      to{opacity:1;transform:translateY(0);}
+    }
+    @media (max-width:480px) {
+      h1 { font-size:22px; }
+      button { font-size:16px; padding:10px 20px; }
+      #resultCard p, #resultCard h2 { font-size:16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>IMPEROSUSHI<br>RUOTA DELLA FORTUNA</h1>
+    <div class="card">
+      <canvas id="wheel" width="560" height="560"></canvas>
+      <div class="center-logo">
+        <img src="sushi-66w.webp" alt="Logo Impero Sushi">
+      </div>
+    </div>
+    <button id="spinBtn">Gira la Ruota</button>
+
+    <!-- Pulsante di reset giri (commentato per uso futuro)
+    <button id="resetBtn">🔄 Reset giri (test)</button>
+    -->
+
+    <div id="resultCard">
+      <h2>🎉 Complimenti!</h2>
+      <p id="resultText">Hai vinto: ...</p>
+      <p>🍣 Impero Sushi ti ringrazia per averci scelto 💖</p>
+      <a href="https://wa.me/393791589589" class="whatsapp-btn">Prenota ora su WhatsApp</a>
+    </div>
+    <div id="historyCard">
+      <h3>🎁 I tuoi premi</h3>
+      <ul id="prizesList"></ul>	
+
+<small id="versioneInfo" style="opacity:0.6; font-size:12px;"></small>
+    </div>
+  </div>
+
+  <audio id="bgMusic" src="musica_cinese.mp3" preload="auto"></audio>
+  <audio id="gongSound" src="gong.mp3" preload="auto"></audio>
+
+<script>
+const visibleSegments = [
+  { label: "🍱 Pranzo Omaggio", note: "(escluso bevande)", weight: 0.3, prize: "Pranzo Omaggio" },
+  { label: "🥩 Cena Omaggio", note: "(escluso bevande)", weight: 0.2, prize: "Cena Omaggio" },
+  { label: "🍸 Cocktail a scelta", note: "", weight: 0.15, prize: "Cocktail a scelta" },
+  { label: "🍰 Dolce a scelta", note: "", weight: 0.15, prize: "Dolce a scelta" },
+  { label: "🥂 Bottiglia di Prosecco", note: "", weight: 0.1, prize: "Bottiglia di Prosecco" },
+  { label: "👥 Porta 3 amici -30%", note: "", weight: 0.1, prize: "Sconto 30% se porti 3 amici" }
+];
+
+//VERSIONE DELLA RUOTA
+const versioneRuota = "1.5";
+
+const canvas = document.getElementById('wheel');
+const ctx = canvas.getContext('2d');
+const cx = canvas.width / 2, cy = canvas.height / 2;
+const radius = canvas.width / 2 - 10;
+const spinBtn = document.getElementById('spinBtn');
+const resultCard = document.getElementById('resultCard');
+const resultText = document.getElementById('resultText');
+const bgMusic = document.getElementById('bgMusic');
+const gongSound = document.getElementById('gongSound');
+const prizesList = document.getElementById('prizesList');
+const versioneInfo = document.getElementById('versioneInfo');
+
+versioneInfo.textContent = `Versione ruota: ${versioneRuota}`;
+// Questo codice è nato per servire l'ImperoSushi. Se lo trovi altrove... è stato rapito 🥷
+let premiSalvati = JSON.parse(localStorage.getItem('premiVinti')) || [];
+let spinsCount = parseInt(localStorage.getItem('spinsCount')) || 0;
+const versioneSalvata = localStorage.getItem('versioneRuota');
+
+if (versioneSalvata !== versioneRuota) {
+  if (spinsCount >= 3 && premiSalvati.length === 0) {
+    localStorage.removeItem('spinsCount');
+    localStorage.setItem('versioneRuota', versioneRuota);
+    alert("🎉 La ruota è stata aggiornata! Puoi riprovare a vincere.");
+    location.reload();
+  } else if (spinsCount === 0 && premiSalvati.length === 0) {
+    localStorage.setItem('versioneRuota', versioneRuota);
+  }
+}
+
+
+if (spinsCount >= 3) {
+  spinBtn.disabled = true;
+  spinBtn.textContent = "Limite di 3 giri raggiunto";
+}
+
+premiSalvati.forEach(p => aggiungiPremioAllaLista(p));
+
+function drawWheel(rotation = 0) {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.save();
+  ctx.translate(cx, cy);
+  ctx.rotate(rotation - Math.PI / 2);
+
+  let startAngle = 0;
+  for (let i = 0; i < visibleSegments.length; i++) {
+    const seg = visibleSegments[i];
+    const segAngle = seg.weight * Math.PI * 2;
+    const endAngle = startAngle + segAngle;
+
+    ctx.beginPath();
+    ctx.moveTo(0, 0);
+    ctx.arc(0, 0, radius, startAngle, endAngle);
+    ctx.closePath();
+    ctx.fillStyle = i % 2 === 0 ? "#e63946" : "#f9c74f";
+    ctx.fill();
+
+    const midAngle = (startAngle + endAngle) / 2;
+    const textRadius = radius * 0.65;
+    const textX = Math.cos(midAngle) * textRadius;
+    const textY = Math.sin(midAngle) * textRadius;
+
+    ctx.save();
+    ctx.translate(textX, textY);
+    ctx.rotate(midAngle);
+    if (midAngle > Math.PI / 2 && midAngle < (3 * Math.PI) / 2) {
+      ctx.rotate(Math.PI);
+    }
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillStyle = "#111";
+    ctx.font = "bold 15px Inter, sans-serif";
+    ctx.fillText(seg.label, 0, 0);
+    if (seg.note) {
+      ctx.font = "bold 11px Inter, sans-serif";
+      ctx.fillText(seg.note, 0, 18);
+    }
+    ctx.restore();
+
+    startAngle = endAngle;
+  }
+
+  ctx.restore();
+
+  ctx.beginPath();
+  ctx.arc(cx, cy, radius + 5, 0, Math.PI * 2);
+  ctx.lineWidth = 6;
+  ctx.strokeStyle = "#d4af37";
+  ctx.stroke();
+
+  ctx.save();
+  ctx.shadowColor = "#5c4422";
+  ctx.shadowBlur = 6;
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(cx, 48);
+  ctx.lineWidth = 8;
+  ctx.strokeStyle = "#f9c74f";
+  ctx.stroke();
+  ctx.restore();
+
+  ctx.save();
+  ctx.shadowColor = "#5c4422";
+  ctx.shadowBlur = 6;
+  ctx.beginPath();
+  ctx.moveTo(cx, 12);
+  ctx.lineTo(cx - 18, 48);
+  ctx.lineTo(cx + 18, 48);
+  ctx.closePath();
+  ctx.fillStyle = "#f9c74f";
+  ctx.fill();
+  ctx.lineWidth = 2;
+  ctx.strokeStyle = "#5c4422";
+  ctx.stroke();
+  ctx.restore();
+}
+
+drawWheel(0);
+
+function aggiungiPremioAllaLista(premioObj) {
+  const li = document.createElement('li');
+  const scadenza = new Date(premioObj.scadenza);
+  const oggi = new Date();
+  const scaduto = oggi > scadenza;
+
+  li.textContent = `${premioObj.nome} - ${scaduto ? "❌ Scaduto" : "Valido per 10 giorni"}`;
+  li.dataset.scadenza = premioObj.scadenza;
+
+  if (scaduto) {
+    li.style.color = "#999";
+    li.style.textDecoration = "line-through";
+    li.style.opacity = "0.6";
+  }
+
+  prizesList.appendChild(li);
+}
+
+function aggiornaStatoPremi() {
+  const oggi = new Date();
+  const items = prizesList.querySelectorAll('li');
+  items.forEach(li => {
+    const scadenza = new Date(li.dataset.scadenza);
+    if (oggi > scadenza && !li.textContent.includes("Scaduto")) {
+      li.textContent = li.textContent.replace("Valido per 10 giorni", "❌ Scaduto");
+      li.style.color = "#999";
+      li.style.textDecoration = "line-through";
+      li.style.opacity = "0.6";
+    }
+  });
+}
+setInterval(aggiornaStatoPremi, 60 * 1000);
+
+let spinning = false;
+
+function spin() {
+  if (spinning || spinsCount >= 3) return;
+
+  spinsCount++;
+  localStorage.setItem('spinsCount', spinsCount);
+  spinning = true;
+  resultCard.style.display = "none";
+
+  const duration = 5000;
+  const startTime = performance.now();
+  const totalRotation = Math.PI * 2 * (3 + Math.random() * 2);
+
+  function easeOutCubic(t) {
+    return 1 - Math.pow(1 - t, 3);
+  }
+
+  function frame(now) {
+    const elapsed = now - startTime;
+    const t = Math.min(1, elapsed / duration);
+    const eased = easeOutCubic(t);
+    const currentRotation = totalRotation * eased;
+    drawWheel(currentRotation);
+
+    if (t < 1) {
+      requestAnimationFrame(frame);
+    } else {
+      spinning = false;
+      const adjustedAngle = (0 - currentRotation % (Math.PI * 2) + Math.PI * 2) % (Math.PI * 2);
+      let cumulative = 0;
+      let prize;
+      for (let seg of visibleSegments) {
+        cumulative += seg.weight * Math.PI * 2;
+        if (adjustedAngle < cumulative) {
+          prize = seg.prize;
+          break;
+        }
+      }
+
+      gongSound.currentTime = 0;
+      gongSound.play();
+      const expiryDate = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000);
+      const premioObj = {
+        nome: prize,
+        scadenza: expiryDate.toISOString()
+      };
+
+      premiSalvati.push(premioObj);
+      localStorage.setItem('premiVinti', JSON.stringify(premiSalvati));
+      aggiungiPremioAllaLista(premioObj);
+
+      resultText.innerHTML = `
+        Hai vinto: <strong style="color:#d4af37">${prize}</strong><br>
+        <small style="color:#555">Valido entro 10 giorni</small><br><br>
+      `;
+
+      resultCard.style.display = "block";
+
+      if (spinsCount >= 3) {
+        spinBtn.disabled = true;
+        spinBtn.textContent = "Limite di 3 giri raggiunto";
+      }
+    }
+  }
+
+  requestAnimationFrame(frame);
+}
+
+let musicaAvviata = false;
+
+function avviaMusica() {
+  if (!musicaAvviata) {
+    bgMusic.loop = true;
+    bgMusic.volume = 0.4;
+    bgMusic.play().catch(() => {
+      console.warn("Autoplay bloccato dal browser");
+    });
+    musicaAvviata = true;
+  }
+}
+
+document.addEventListener('click', avviaMusica);
+document.addEventListener('touchstart', avviaMusica);
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && musicaAvviata) {
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+    musicaAvviata = false;
+  }
+});
+
+window.addEventListener("beforeunload", () => {
+  if (musicaAvviata) {
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+    musicaAvviata = false;
+  }
+});
+
+
+spinBtn.addEventListener('click', spin);
+
+</script>
+</body>
+</html>
