@@ -197,12 +197,38 @@ const bgMusic = document.getElementById('bgMusic');
 const gongSound = document.getElementById('gongSound');
 const prizesList = document.getElementById('prizesList');
 
-document.addEventListener('click', function startMusic() {
-  bgMusic.loop = true;
-  bgMusic.volume = 0.4;
-  bgMusic.play();
-  document.removeEventListener('click', startMusic);
+let musicaAvviata = false;
+
+function avviaMusica() {
+  if (!musicaAvviata) {
+    bgMusic.loop = true;
+    bgMusic.volume = 0.4;
+    bgMusic.play().catch(() => {
+      console.warn("Autoplay bloccato dal browser");
+    });
+    musicaAvviata = true;
+  }
+}
+
+document.addEventListener('click', avviaMusica);
+document.addEventListener('touchstart', avviaMusica); // per dispositivi mobili
+
+document.addEventListener("visibilitychange", () => {
+  if (document.hidden && musicaAvviata) {
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+    musicaAvviata = false;
+  }
 });
+
+window.addEventListener("beforeunload", () => {
+  if (musicaAvviata) {
+    bgMusic.pause();
+    bgMusic.currentTime = 0;
+    musicaAvviata = false;
+  }
+});
+
 
 function drawWheel(rotation = 0) {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
