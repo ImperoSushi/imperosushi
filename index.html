@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Ruota della Fortuna - Impero Sushi</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600&family=Inter&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family:'Inter',sans-serif;
+      background: radial-gradient(circle at center, #0b1d3a 0%, #1a1f3a 100%);
+      color:#f0f0f0;
+    }
+    .wrap {
+      max-width:800px;
+      width:100%;
+      padding:20px;
+      box-sizing:border-box;
+      text-align:center;
+    }
+    h1 {
+      margin:10px 0;
+      font-size:30px;
+      font-family:'Cinzel',serif;
+      color:#d4af37;
+      letter-spacing:2px;
+    }
+    .card {
+      position:relative;
+      width:100%;
+      max-width:560px;
+      aspect-ratio:1/1;
+      margin:0 auto;
+      border-radius:50%;
+      box-shadow:0 0 30px rgba(212,175,55,0.3);
+      background: radial-gradient(circle, #1a1f3a 0%, #0b1d3a 100%);
+    }
+    canvas {
+      width:100%;
+      height:auto;
+      display:block;
+    }
+    .center-logo {
+      position:absolute;
+      top:50%;
+      left:50%;
+      transform:translate(-50%,-50%);
+      width:100px;
+      height:100px;
+      background:black;
+      border-radius:50%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border:3px solid #d4af37;
+      box-shadow:0 0 15px #d4af37;
+      pointer-events:none;
+    }
+    .center-logo img {
+      width:80px;
+      height:80px;
+      object-fit:contain;
+    }
+    button {
+      margin-top:20px;
+      padding:12px 30px;
+      border-radius:10px;
+      border:none;
+      background:linear-gradient(145deg,#d4af37,#bfa134);
+      color:#0b1d3a;
+      font-weight:600;
+      cursor:pointer;
+      font-size:18px;
+      transition:transform 0.2s ease;
+    }
+    button:hover { transform:scale(1.05); }
+    button:disabled {
+      background:#555;
+      color:#999;
+      cursor:not-allowed;
+    }
+    #resultCard {
+      display:none;
+      margin-top:20px;
+      padding:20px;
+      border-radius:14px;
+      background:rgba(20,30,50,0.9);
+      border:2px solid #d4af37;
+      color:#f5f5f5;
+      animation:fadeIn 1s ease forwards;
+    }
+    #resultCard h2 {
+      font-size:24px;
+      margin-bottom:10px;
+      color:#d4af37;
+      font-family:'Cinzel',serif;
+    }
+    #resultCard p {
+      margin:6px 0;
+      font-size:18px;
+    }
+    .whatsapp-btn {
+      display:inline-block;
+      margin-top:12px;
+      padding:12px 18px;
+      background:#d4af37;
+      color:#0b1d3a;
+      font-weight:600;
+      border-radius:10px;
+      text-decoration:none;
+      font-size:16px;
+      transition:background 0.2s;
+    }
+    .whatsapp-btn:hover { background:#bfa134; }
+    #historyCard {
+      margin-top:20px;
+      padding:15px;
+      border-radius:10px;
+      background:rgba(20,30,50,0.85);
+      border:1px solid #d4af37;
+      max-width:500px;
+      margin-left:auto;
+      margin-right:auto;
+      text-align:left;
+    }
+    #historyCard h3 {
+      margin-top:0;
+      color:#d4af37;
+      font-family:'Cinzel',serif;
+    }
+    #prizesList { padding-left:20px; }
+    @keyframes fadeIn {
+      from{opacity:0;transform:translateY(10px);}
+      to{opacity:1;transform:translateY(0);}
+    }
+    @keyframes lampeggia {
+      0% { opacity: 1; }
+      50% { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+    @media (max-width:480px) {
+      h1 { font-size:22px; }
+      button { font-size:16px; padding:10px 20px; }
+      #resultCard p, #resultCard h2 { font-size:16px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h1>IMPEROSUSHI<br>RUOTA DELLA FORTUNA</h1>
+    <div id="adminBadge" style="display: none; margin: 10px auto; padding: 6px 12px; background: #d4af37; color: #0b1d3a; font-weight: bold; border-radius: 8px; font-size: 14px; max-width: fit-content; box-shadow: 0 0 10px rgba(212,175,55,0.4);">🛡️ Admin attivo</div>
+
+    <div class="card">
+      <canvas id="wheel" width="560" height="560"></canvas>
+
+      <div id="giriRimasti" style="margin-top: 10px; font-weight: bold; font-size: 16px; color: #999;">
+        Giri rimasti: 3
+      </div>
+
+      <div class="center-logo">
+        <img src="sushi-66w.webp" alt="Logo Impero Sushi">
+      </div>
+    </div>
+    <button id="spinBtn">Gira la Ruota</button>
+    <div id="resultCard">
+      <h2>🎉 Complimenti!</h2>
+      <p id="resultText">Hai vinto: ...</p>
+      <p>🍣 Impero Sushi ti ringrazia per averci scelto 💖</p>
+    </div>
+    <div id="historyCard">
+      <h3>🎁 I tuoi premi</h3>
+      <ul id="prizesList"></ul>
+      <small id="versioneInfo" style="opacity:0.6; font-size:12px;"></small>
+    </div>
+  </div>
+
+  <audio id="bgMusic" src="musica_cinese.mp3" preload="auto"></audio>
+  <audio id="gongSound" src="gong.mp3" preload="auto"></audio>
+
+<script>
+
+const _0x347629=_0x582d;(function(_0xbb4a25,_0x565dbc){const _0x4dcceb=_0x582d,_0x44ece8=_0xbb4a25();while(!![]){try{const _0x40186d=-parseInt(_0x4dcceb(0x1b0))/0x1*(-parseInt(_0x4dcceb(0x190))/0x2)+parseInt(_0x4dcceb(0x182))/0x3+-parseInt(_0x4dcceb(0x1d3))/0x4*(-parseInt(_0x4dcceb(0x17d))/0x5)+-parseInt(_0x4dcceb(0x1e5))/0x6+parseInt(_0x4dcceb(0x1db))/0x7*(-parseInt(_0x4dcceb(0x199))/0x8)+parseInt(_0x4dcceb(0x1f5))/0x9+parseInt(_0x4dcceb(0x1f2))/0xa;if(_0x40186d===_0x565dbc)break;else _0x44ece8['push'](_0x44ece8['shift']());}catch(_0x3b4bfe){_0x44ece8['push'](_0x44ece8['shift']());}}}(_0x2946,0x318a3));const versioneRuota=_0x347629(0x1cf),canvas=document[_0x347629(0x19a)](_0x347629(0x1c3)),ctx=canvas[_0x347629(0x1d4)]('2d'),cx=canvas['width']/0x2,cy=canvas[_0x347629(0x194)]/0x2,radius=canvas[_0x347629(0x1bc)]/0x2-0xa,versioneInfo=document[_0x347629(0x19a)]('versioneInfo'),spinBtn=document[_0x347629(0x19a)](_0x347629(0x1cc)),resultCard=document[_0x347629(0x19a)]('resultCard'),resultText=document[_0x347629(0x19a)](_0x347629(0x188)),prizesList=document[_0x347629(0x19a)](_0x347629(0x1ad)),gongSound=document[_0x347629(0x19a)](_0x347629(0x1ce)),bgMusic=document[_0x347629(0x19a)](_0x347629(0x192)),isAdmin=window[_0x347629(0x17b)][_0x347629(0x209)][_0x347629(0x193)](_0x347629(0x1b8));function encode(_0x1ded28){const _0x38290d=_0x347629;return btoa(JSON[_0x38290d(0x1f0)](_0x1ded28));}function decode(_0x1f0890){const _0x3178de=_0x347629;try{return JSON[_0x3178de(0x1fb)](atob(_0x1f0890));}catch{return[];}}function hash(_0x314e55){const _0x685e25=_0x347629;return _0x314e55[_0x685e25(0x1a9)]('')[_0x685e25(0x1d5)]((_0x724a88,_0x22c403)=>_0x724a88+_0x22c403[_0x685e25(0x189)](0x0),0x0);}function salvaConFirma(_0x523544,_0xc9c789){const _0x5031fd=_0x347629,_0x4ce2fe=JSON['stringify'](_0xc9c789),_0x3a84f4=hash(_0x4ce2fe);localStorage['setItem'](_0x523544,btoa(_0x4ce2fe)),localStorage[_0x5031fd(0x1cb)](_0x523544+_0x5031fd(0x1d8),_0x3a84f4);}function caricaConVerifica(_0x5f7b1e){const _0xc4305d=_0x347629,_0x26b165=localStorage[_0xc4305d(0x184)](_0x5f7b1e),_0x646df=parseInt(localStorage[_0xc4305d(0x184)](_0x5f7b1e+_0xc4305d(0x1d8))),_0x212c85=/^[A-Za-z0-9+/=]+$/;if(!_0x26b165||!_0x212c85['test'](_0x26b165))return[];try{const _0x587ae6=atob(_0x26b165);if(hash(_0x587ae6)!==_0x646df)return[];return JSON[_0xc4305d(0x1fb)](_0x587ae6);}catch{return[];}}const bypassConsoleBlock=window['location'][_0x347629(0x209)][_0x347629(0x193)]('admin=true');if(bypassConsoleBlock){const badge=document['getElementById'](_0x347629(0x181));if(badge)badge[_0x347629(0x1a0)][_0x347629(0x1dc)]=_0x347629(0x1d2);}const visibleSegments=[{'label':_0x347629(0x206),'note':_0x347629(0x200),'weight':0.18,'prize':_0x347629(0x195)},{'label':_0x347629(0x1a5),'note':'(escluso\x20bevande)','weight':0.12,'prize':_0x347629(0x17a)},{'label':'🍸\x20Cocktail\x20a\x20scelta','note':'','weight':0.1,'prize':_0x347629(0x1f4)},{'label':_0x347629(0x198),'note':'','weight':0.1,'prize':_0x347629(0x1cd)},{'label':_0x347629(0x203),'note':'','weight':0.08,'prize':_0x347629(0x1e2)},{'label':_0x347629(0x1ab),'note':'','weight':0.08,'prize':_0x347629(0x1ec)},{'label':'👥\x20Porta\x203\x20amici\x20-30%','note':'','weight':0.12,'prize':'Sconto\x2030%\x20se\x20porti\x203\x20amici'},{'label':_0x347629(0x1c5),'note':'','weight':0.06,'prize':_0x347629(0x1b6)},{'label':_0x347629(0x1d9),'note':'','weight':0.02,'prize':_0x347629(0x18c)},{'label':_0x347629(0x1be),'note':'','weight':0.14,'prize':_0x347629(0x1d0)}];versioneInfo[_0x347629(0x1eb)]='Versione\x20ruota:\x20'+versioneRuota;let premiSalvati=caricaConVerifica(_0x347629(0x1f1));if(!Array[_0x347629(0x18d)](premiSalvati))premiSalvati=[];const premiRaw=localStorage[_0x347629(0x184)](_0x347629(0x1f1)),firmaRaw=localStorage['getItem'](_0x347629(0x1a2)),primaVisita=!premiRaw&&!firmaRaw,firmaValida=primaVisita||premiSalvati['length']>=0x0;!firmaValida&&(alert('⚠️\x20I\x20dati\x20salvati\x20sono\x20corrotti\x20o\x20mancanti.\x0aLa\x20ruota\x20è\x20bloccata\x20per\x20sicurezza.'),spinBtn[_0x347629(0x1f6)]=!![],spinBtn[_0x347629(0x1eb)]=_0x347629(0x1ae));function _0x2946(){const _0x1be108=['lineTo','lineWidth','adminBadge','120225rNoXah','nome','getItem','#f9c74f','now','#999','resultText','charCodeAt','textDecoration','dataset','Jackpot\x20100\x20euro','isArray','toISOString','cos','72902qCmwRG','label','bgMusic','includes','height','Pranzo\x20Omaggio','animation','textBaseline','🍰\x20Dolce\x20a\x20scelta','40ifNaAv','getElementById','true','addEventListener','beginPath','restore','click','style','DOMContentLoaded','premiVinti_sig','jackpotVinto','assign','🥩\x20Cena\x20Omaggio','clearRect','visibilitychange','middle','split','innerHTML','🥂\x20Bottiglia\x20di\x20Prosecco','❌\x20Scaduto','prizesList','Ruota\x20bloccata','catch','3KGcnXo','hidden','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Nessun\x20premio\x20selezionato.<br>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Probabilmente\x20il\x20Jackpot\x20è\x20già\x20stato\x20vinto.\x0a\x20\x20\x20\x20\x20\x20\x20\x20','giriRimasti','color','line-through','Bonus\x2020\x20euro','touchstart','admin=true','#5c4422','shadowColor','rotate','width','Giri\x20rimasti:\x20','😅\x20Nessuna\x20Vincita','fillText','save','moveTo','strokeStyle','wheel','play','💶\x20Bonus\x2020\x20euro','scadenza','arc','font','weight','min','setItem','spinBtn','Dolce\x20a\x20scelta','gongSound','2.2','Nessuna\x20vincita','currentTime','block','5524vpJYwL','getContext','reduce','closePath','removeItem','_sig','💰\x20JACKPOT\x20100\x20euro','reload','423374rhPXGz','display','max','center','#e63946','length','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Hai\x20vinto:\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20<strong\x20style=\x22color:#d4af37\x22>','Bonus\x2010\x20euro','fill','none','1464480qxxqxd','#111','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Hai\x20centrato\x20il\x20Jackpot\x20sulla\x20ruota!\x20🎯\x20<br>\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Tuttavia,\x20per\x20garantire\x20correttezza\x20e\x20trasparenza,\x20il\x20premio\x20viene\x20confermato\x20solo\x20in\x20caso\x20di\x20estrazione\x20valida.\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20In\x20questa\x20occasione,\x20il\x20Jackpot\x20non\x20è\x20stato\x20assegnato,\x20ma\x20vogliamo\x20comunque\x20premiarti\x20con\x20un\x20**Bonus\x20Consolazione\x20da\x2020€**\x20💸\x20<br>\x20\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Grazie\x20per\x20aver\x20giocato\x20con\x20noi\x20e\x20per\x20la\x20fiducia\x20che\x20ci\x20dimostri\x20ogni\x20giorno!\x20🍣<br>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Hai\x20vinto\x20un\x20<strong\x20style=\x22color:#d4af37\x22>Bonus\x20da\x2020€</strong>\x20💸\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','shadowBlur','<br><small\x20style=\x22color:#555\x22>Valido\x20entro\x2010\x20giorni</small>','spinsCount','textContent','Bottiglia\x20di\x20Prosecco','stroke','random','forEach','stringify','premiVinti','5701250CqgInX','note','Cocktail\x20a\x20scelta','107091vTNZcf','disabled','prize','pow','translate','pause','parse','\x20-\x20','#d4af37','querySelectorAll','lampeggia\x201s\x20infinite','(escluso\x20bevande)','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Questa\x20volta\x20non\x20hai\x20vinto\x20😅<br>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Ma\x20la\x20fortuna\x20gira,\x20riprova!\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','0.6','💶\x20Bonus\x2010\x20euro','sin','opacity','🍱\x20Pranzo\x20Omaggio','versioneRuota','fillStyle','search','Valido\x20per\x2010\x20giorni','warn','Scaduto','\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Hai\x20vinto\x20il\x20<strong\x20style=\x22color:#d4af37\x22>Jackpot\x20da\x20100€</strong>!\x20🎉<br>\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20Un\x20premio\x20imperiale\x20ti\x20aspetta\x20🍣\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20','Cena\x20Omaggio','location','Limite\x20di\x203\x20giri\x20raggiunto','65EboFKe','Autoplay\x20bloccato\x20dal\x20browser'];_0x2946=function(){return _0x1be108;};return _0x2946();}let spinsCount=parseInt(localStorage['getItem'](_0x347629(0x1ea)))||0x0;const maxSpinsSaved=parseInt(localStorage[_0x347629(0x184)]('maxSpins'))||0x3,giriRimastiDiv=document[_0x347629(0x19a)](_0x347629(0x1b3));giriRimastiDiv[_0x347629(0x1eb)]=_0x347629(0x1bd)+Math[_0x347629(0x1dd)](0x0,maxSpinsSaved-spinsCount);const versioneSalvata=localStorage[_0x347629(0x184)](_0x347629(0x207));versioneSalvata!==versioneRuota&&(localStorage[_0x347629(0x1d7)](_0x347629(0x1ea)),localStorage[_0x347629(0x1cb)]('versioneRuota',versioneRuota),alert('🎉\x20La\x20ruota\x20è\x20stata\x20aggiornata!\x20Puoi\x20riprovare\x20a\x20vincere.'),location[_0x347629(0x1da)]());spinsCount>=0x3&&(spinBtn[_0x347629(0x1f6)]=!![],spinBtn[_0x347629(0x1eb)]=_0x347629(0x17c));premiSalvati[_0x347629(0x1ef)](_0x3aef26=>aggiungiPremioAllaLista(_0x3aef26));function drawWheel(_0x3e412b=0x0){const _0x9605bd=_0x347629;ctx[_0x9605bd(0x1a6)](0x0,0x0,canvas[_0x9605bd(0x1bc)],canvas['height']),ctx[_0x9605bd(0x1c0)](),ctx[_0x9605bd(0x1f9)](cx,cy),ctx[_0x9605bd(0x1bb)](_0x3e412b-Math['PI']/0x2);let _0x381dd2=0x0;for(let _0x4fc08d=0x0;_0x4fc08d<visibleSegments[_0x9605bd(0x1e0)];_0x4fc08d++){const _0x2bcc81=visibleSegments[_0x4fc08d],_0x2f9456=_0x2bcc81[_0x9605bd(0x1c9)]*Math['PI']*0x2,_0x2f254b=_0x381dd2+_0x2f9456;ctx[_0x9605bd(0x19d)](),ctx[_0x9605bd(0x1c1)](0x0,0x0),ctx[_0x9605bd(0x1c7)](0x0,0x0,radius,_0x381dd2,_0x2f254b),ctx['closePath'](),ctx[_0x9605bd(0x208)]=_0x4fc08d%0x2===0x0?_0x9605bd(0x1df):_0x9605bd(0x185),ctx[_0x9605bd(0x1e3)]();const _0x4ad29e=(_0x381dd2+_0x2f254b)/0x2,_0x2cf071=radius*0.65,_0x5c7f86=Math[_0x9605bd(0x18f)](_0x4ad29e)*_0x2cf071,_0x499b9d=Math[_0x9605bd(0x204)](_0x4ad29e)*_0x2cf071;ctx[_0x9605bd(0x1c0)](),ctx[_0x9605bd(0x1f9)](_0x5c7f86,_0x499b9d),ctx[_0x9605bd(0x1bb)](_0x4ad29e),_0x4ad29e>Math['PI']/0x2&&_0x4ad29e<0x3*Math['PI']/0x2&&ctx[_0x9605bd(0x1bb)](Math['PI']),ctx['textAlign']=_0x9605bd(0x1de),ctx[_0x9605bd(0x197)]=_0x9605bd(0x1a8),ctx[_0x9605bd(0x208)]=_0x9605bd(0x1e6),ctx['font']='bold\x2015px\x20Inter,\x20sans-serif',ctx['fillText'](_0x2bcc81[_0x9605bd(0x191)],0x0,0x0),_0x2bcc81['note']&&(ctx[_0x9605bd(0x1c8)]='bold\x2011px\x20Inter,\x20sans-serif',ctx[_0x9605bd(0x1bf)](_0x2bcc81[_0x9605bd(0x1f3)],0x0,0x12)),ctx['restore'](),_0x381dd2=_0x2f254b;}ctx[_0x9605bd(0x19e)](),ctx['beginPath'](),ctx['arc'](cx,cy,radius+0x5,0x0,Math['PI']*0x2),ctx[_0x9605bd(0x180)]=0x6,ctx[_0x9605bd(0x1c2)]=_0x9605bd(0x1fd),ctx[_0x9605bd(0x1ed)](),ctx[_0x9605bd(0x1c0)](),ctx[_0x9605bd(0x1ba)]='#5c4422',ctx['shadowBlur']=0x6,ctx[_0x9605bd(0x19d)](),ctx['moveTo'](cx,cy),ctx[_0x9605bd(0x17f)](cx,0x30),ctx['lineWidth']=0x8,ctx[_0x9605bd(0x1c2)]=_0x9605bd(0x185),ctx['stroke'](),ctx[_0x9605bd(0x19e)](),ctx['save'](),ctx[_0x9605bd(0x1ba)]=_0x9605bd(0x1b9),ctx[_0x9605bd(0x1e8)]=0x6,ctx[_0x9605bd(0x19d)](),ctx[_0x9605bd(0x1c1)](cx,0xc),ctx[_0x9605bd(0x17f)](cx-0x12,0x30),ctx[_0x9605bd(0x17f)](cx+0x12,0x30),ctx[_0x9605bd(0x1d6)](),ctx['fillStyle']=_0x9605bd(0x185),ctx[_0x9605bd(0x1e3)](),ctx[_0x9605bd(0x180)]=0x2,ctx['strokeStyle']='#5c4422',ctx[_0x9605bd(0x1ed)](),ctx[_0x9605bd(0x19e)]();}function aggiungiPremioAllaLista(_0x545b13){const _0x12e46a=_0x347629,_0x4498a1=document['createElement']('li'),_0x4d5146=new Date(_0x545b13[_0x12e46a(0x1c6)]),_0x5eeefc=new Date(),_0x2cf1fc=_0x5eeefc>_0x4d5146;_0x4498a1['textContent']=_0x545b13[_0x12e46a(0x183)]+_0x12e46a(0x1fc)+(_0x2cf1fc?_0x12e46a(0x1ac):'Valido\x20per\x2010\x20giorni'),_0x4498a1[_0x12e46a(0x18b)][_0x12e46a(0x1c6)]=_0x545b13[_0x12e46a(0x1c6)],_0x2cf1fc&&Object[_0x12e46a(0x1a4)](_0x4498a1['style'],{'color':_0x12e46a(0x187),'textDecoration':'line-through','opacity':_0x12e46a(0x202)}),prizesList['appendChild'](_0x4498a1);}function _0x582d(_0x509d43,_0x104869){const _0x2946b7=_0x2946();return _0x582d=function(_0x582d16,_0x5d96f4){_0x582d16=_0x582d16-0x179;let _0xe5f0b3=_0x2946b7[_0x582d16];return _0xe5f0b3;},_0x582d(_0x509d43,_0x104869);}function aggiornaStatoPremi(){const _0xf537db=_0x347629,_0x25e753=new Date(),_0x3cdb6b=prizesList[_0xf537db(0x1fe)]('li');_0x3cdb6b[_0xf537db(0x1ef)](_0x3459d1=>{const _0x152a30=_0xf537db,_0x3e9e6=new Date(_0x3459d1[_0x152a30(0x18b)][_0x152a30(0x1c6)]);_0x25e753>_0x3e9e6&&!_0x3459d1['textContent']['includes'](_0x152a30(0x20c))&&(_0x3459d1['textContent']=_0x3459d1[_0x152a30(0x1eb)]['replace'](_0x152a30(0x20a),_0x152a30(0x1ac)),_0x3459d1[_0x152a30(0x1a0)][_0x152a30(0x1b4)]=_0x152a30(0x187),_0x3459d1[_0x152a30(0x1a0)][_0x152a30(0x18a)]=_0x152a30(0x1b5),_0x3459d1[_0x152a30(0x1a0)][_0x152a30(0x205)]=_0x152a30(0x202));});}setInterval(aggiornaStatoPremi,0x3c*0x3e8);let spinning=![];function spin(){const _0x708ba2=_0x347629;if(spinning||spinsCount>=0x3)return;spinsCount++,localStorage[_0x708ba2(0x1cb)](_0x708ba2(0x1ea),spinsCount);const _0x34dc79=Math[_0x708ba2(0x1dd)](0x0,maxSpinsSaved-spinsCount);giriRimastiDiv['textContent']=_0x708ba2(0x1bd)+_0x34dc79;if(_0x34dc79===0x1)giriRimastiDiv[_0x708ba2(0x1a0)][_0x708ba2(0x196)]=_0x708ba2(0x1ff);else _0x34dc79===0x0?(giriRimastiDiv['style'][_0x708ba2(0x196)]=_0x708ba2(0x1e4),giriRimastiDiv[_0x708ba2(0x1a0)][_0x708ba2(0x1b4)]='#999',giriRimastiDiv[_0x708ba2(0x1a0)][_0x708ba2(0x205)]=_0x708ba2(0x202)):giriRimastiDiv[_0x708ba2(0x1a0)][_0x708ba2(0x196)]=_0x708ba2(0x1e4);spinning=!![],resultCard[_0x708ba2(0x1a0)]['display']=_0x708ba2(0x1e4),resultText[_0x708ba2(0x1aa)]='';const _0x195fce=0x1388,_0x55645e=performance[_0x708ba2(0x186)](),_0x7c81eb=Math['PI']*0x2*(0x3+Math[_0x708ba2(0x1ee)]()*0x2);function _0x194d60(_0x124d82){const _0x2fa037=_0x708ba2;return 0x1-Math[_0x2fa037(0x1f8)](0x1-_0x124d82,0x3);}function _0x4c1322(_0x4c8f43){const _0x43ffc0=_0x708ba2,_0x40b3c1=_0x4c8f43-_0x55645e,_0x2fc269=Math[_0x43ffc0(0x1ca)](0x1,_0x40b3c1/_0x195fce),_0x3e7ed4=_0x194d60(_0x2fc269),_0x3a6b6d=_0x7c81eb*_0x3e7ed4;drawWheel(_0x3a6b6d);if(_0x2fc269<0x1)requestAnimationFrame(_0x4c1322);else{spinning=![];const _0x34f078=(Math['PI']*0x2-_0x7c81eb%(Math['PI']*0x2))%(Math['PI']*0x2),_0x4a3d9c=localStorage[_0x43ffc0(0x184)](_0x43ffc0(0x1a3))==='true';let _0xab6dd5=0x0,_0x33daeb;for(let _0x13f77e of visibleSegments){const _0x593b6f=_0x13f77e[_0x43ffc0(0x1c9)]*Math['PI']*0x2;if(_0x4a3d9c&&_0x13f77e[_0x43ffc0(0x1f7)]==='Jackpot\x20100\x20euro'){_0xab6dd5+=_0x593b6f;continue;}if(_0x34f078>=_0xab6dd5&&_0x34f078<_0xab6dd5+_0x593b6f){_0x33daeb=_0x13f77e[_0x43ffc0(0x1f7)];if(_0x33daeb===_0x43ffc0(0x18c)){const _0x4fa95d=0.005,_0x4732cd=Math[_0x43ffc0(0x1ee)]();_0x4732cd>_0x4fa95d?(_0x33daeb=_0x43ffc0(0x1b6),resultText[_0x43ffc0(0x1aa)]=_0x43ffc0(0x1e7)):(localStorage[_0x43ffc0(0x1cb)](_0x43ffc0(0x1a3),_0x43ffc0(0x19b)),resultText['innerHTML']=_0x43ffc0(0x179));}else _0x33daeb===_0x43ffc0(0x1d0)?resultText[_0x43ffc0(0x1aa)]=_0x43ffc0(0x201):resultText[_0x43ffc0(0x1aa)]=_0x43ffc0(0x1e1)+_0x33daeb+'</strong>\x20🎁\x0a\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20\x20';break;}_0xab6dd5+=_0x593b6f;}if(!_0x33daeb){resultText[_0x43ffc0(0x1aa)]=_0x43ffc0(0x1b2),document['getElementById']('gongSound')[_0x43ffc0(0x1c4)](),resultCard[_0x43ffc0(0x1a0)][_0x43ffc0(0x1dc)]=_0x43ffc0(0x1d2);return;}const _0x5e6b8d=new Date(Date[_0x43ffc0(0x186)]()+0xa*0x18*0x3c*0x3c*0x3e8),_0x4c3ceb={'nome':_0x33daeb,'scadenza':_0x5e6b8d[_0x43ffc0(0x18e)]()};_0x4c3ceb[_0x43ffc0(0x183)]!==_0x43ffc0(0x1d0)&&(premiSalvati['push'](_0x4c3ceb),salvaConFirma(_0x43ffc0(0x1f1),premiSalvati),aggiungiPremioAllaLista(_0x4c3ceb)),resultText[_0x43ffc0(0x1aa)]+=_0x43ffc0(0x1e9),document[_0x43ffc0(0x19a)](_0x43ffc0(0x1ce))[_0x43ffc0(0x1c4)](),resultCard['style'][_0x43ffc0(0x1dc)]=_0x43ffc0(0x1d2),spinsCount>=0x3&&(spinBtn[_0x43ffc0(0x1f6)]=!![],spinBtn[_0x43ffc0(0x1eb)]=_0x43ffc0(0x17c));}}requestAnimationFrame(_0x4c1322);}let musicaAvviata=![];function avviaMusica(){const _0x1b7285=_0x347629;!musicaAvviata&&(bgMusic['loop']=!![],bgMusic['volume']=0.2,bgMusic[_0x1b7285(0x1c4)]()[_0x1b7285(0x1af)](()=>{const _0x190a3e=_0x1b7285;console[_0x190a3e(0x20b)](_0x190a3e(0x17e));}),musicaAvviata=!![]);}document[_0x347629(0x19c)](_0x347629(0x19f),avviaMusica),document['addEventListener'](_0x347629(0x1b7),avviaMusica),document[_0x347629(0x19c)](_0x347629(0x1a7),()=>{const _0x587325=_0x347629;document[_0x587325(0x1b1)]&&musicaAvviata&&(bgMusic[_0x587325(0x1fa)](),bgMusic[_0x587325(0x1d1)]=0x0,musicaAvviata=![]);}),window[_0x347629(0x19c)]('beforeunload',()=>{const _0x138159=_0x347629;musicaAvviata&&(bgMusic[_0x138159(0x1fa)](),bgMusic[_0x138159(0x1d1)]=0x0,musicaAvviata=![]);}),document[_0x347629(0x19c)](_0x347629(0x1a1),()=>{const _0x574409=_0x347629;drawWheel(0x0);if(isAdmin){const _0x235325=document[_0x574409(0x19a)]('adminBadge');if(_0x235325)_0x235325[_0x574409(0x1a0)][_0x574409(0x1dc)]=_0x574409(0x1d2);};}),spinBtn[_0x347629(0x19c)](_0x347629(0x19f),spin);
+
+  </script>
+</body>
+</html>
